@@ -1,0 +1,62 @@
+// Task3Scheduler.java
+import java.io.*;
+import java.util.*;
+
+class DynamicJob implements Comparable<DynamicJob> {
+    int jobId;
+    int processingTime;
+    int arrivalTime;
+
+    public DynamicJob(int jobId, int processingTime, int arrivalTime) {
+        this.jobId = jobId;
+        this.processingTime = processingTime;
+        this.arrivalTime = arrivalTime;
+    }
+
+    @Override
+    public int compareTo(DynamicJob other) {
+        return Integer.compare(this.processingTime, other.processingTime);
+    }
+}
+
+public class Task3Scheduler {
+    public static void main(String[] args) throws IOException {
+        PriorityQueue<DynamicJob> jobQueue = new PriorityQueue<>();
+        List<DynamicJob> jobs = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("task3-input.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(", ");
+                int jobId = Integer.parseInt(parts[0]);
+                int processingTime = Integer.parseInt(parts[1]);
+                int arrivalTime = Integer.parseInt(parts[2]);
+                jobs.add(new DynamicJob(jobId, processingTime, arrivalTime));
+            }
+        }
+
+        int currentTime = 0;
+        double totalCompletionTime = 0;
+        List<Integer> executionOrder = new ArrayList<>();
+        int index = 0;
+
+        while (index < jobs.size() || !jobQueue.isEmpty()) {
+            while (index < jobs.size() && jobs.get(index).arrivalTime <= currentTime) {
+                jobQueue.add(jobs.get(index));
+                index++;
+            }
+
+            if (!jobQueue.isEmpty()) {
+                DynamicJob job = jobQueue.poll();
+                currentTime += job.processingTime;
+                totalCompletionTime += currentTime;
+                executionOrder.add(job.jobId);
+            } else {
+                currentTime++;
+            }
+        }
+
+        System.out.println("Execution order: " + executionOrder);
+        System.out.printf("Average completion time: %.2f%n", totalCompletionTime / jobs.size());
+    }
+}
