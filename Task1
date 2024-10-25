@@ -1,0 +1,47 @@
+// Task1Scheduler.java
+import java.io.*;
+import java.util.*;
+
+class Job implements Comparable<Job> {
+    int jobId;
+    int processingTime;
+
+    public Job(int jobId, int processingTime) {
+        this.jobId = jobId;
+        this.processingTime = processingTime;
+    }
+
+    @Override
+    public int compareTo(Job other) {
+        return Integer.compare(this.processingTime, other.processingTime);
+    }
+}
+
+public class Task1Scheduler {
+    public static void main(String[] args) throws IOException {
+        List<Job> jobs = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("task1-input.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(" ");
+                int jobId = Integer.parseInt(parts[0]);
+                int processingTime = Integer.parseInt(parts[1]);
+                jobs.add(new Job(jobId, processingTime));
+            }
+        }
+
+        Collections.sort(jobs);
+        int currentTime = 0;
+        double totalCompletionTime = 0;
+        List<Integer> executionOrder = new ArrayList<>();
+
+        for (Job job : jobs) {
+            currentTime += job.processingTime;
+            totalCompletionTime += currentTime;
+            executionOrder.add(job.jobId);
+        }
+
+        System.out.println("Execution order: " + executionOrder);
+        System.out.printf("Average completion time: %.2f%n", totalCompletionTime / jobs.size());
+    }
+}
