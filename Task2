@@ -1,0 +1,53 @@
+// Task2Scheduler.java
+import java.io.*;
+import java.util.*;
+
+class PriorityJob implements Comparable<PriorityJob> {
+    int jobId;
+    int processingTime;
+    int priority;
+
+    public PriorityJob(int jobId, int processingTime, int priority) {
+        this.jobId = jobId;
+        this.processingTime = processingTime;
+        this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(PriorityJob other) {
+        if (this.priority == other.priority) {
+            return Integer.compare(this.processingTime, other.processingTime);
+        }
+        return Integer.compare(this.priority, other.priority);
+    }
+}
+
+public class Task2Scheduler {
+    public static void main(String[] args) throws IOException {
+        List<PriorityJob> jobs = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("task2-input.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(" ");
+                int jobId = Integer.parseInt(parts[0]);
+                int processingTime = Integer.parseInt(parts[1]);
+                int priority = Integer.parseInt(parts[2]);
+                jobs.add(new PriorityJob(jobId, processingTime, priority));
+            }
+        }
+
+        Collections.sort(jobs);
+        int currentTime = 0;
+        double totalCompletionTime = 0;
+        List<Integer> executionOrder = new ArrayList<>();
+
+        for (PriorityJob job : jobs) {
+            currentTime += job.processingTime;
+            totalCompletionTime += currentTime;
+            executionOrder.add(job.jobId);
+        }
+
+        System.out.println("Execution order: " + executionOrder);
+        System.out.printf("Average completion time: %.2f%n", totalCompletionTime / jobs.size());
+    }
+}
