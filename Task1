@@ -1,47 +1,46 @@
-// Task1Scheduler.java
 import java.io.*;
 import java.util.*;
 
 class Job implements Comparable<Job> {
-    int jobId;
-    int processingTime;
+    int id, time;
 
-    public Job(int jobId, int processingTime) {
-        this.jobId = jobId;
-        this.processingTime = processingTime;
+    Job(int id, int time) {
+        this.id = id;
+        this.time = time;
     }
 
     @Override
     public int compareTo(Job other) {
-        return Integer.compare(this.processingTime, other.processingTime);
+        return Integer.compare(this.time, other.time);
     }
 }
 
 public class Task1Scheduler {
+
     public static void main(String[] args) throws IOException {
         List<Job> jobs = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("task1-input.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(" ");
-                int jobId = Integer.parseInt(parts[0]);
-                int processingTime = Integer.parseInt(parts[1]);
-                jobs.add(new Job(jobId, processingTime));
-            }
+        BufferedReader reader = new BufferedReader(new FileReader("task1-input.txt"));
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(" ");
+            int jobId = Integer.parseInt(parts[0]);
+            int jobTime = Integer.parseInt(parts[1]);
+            jobs.add(new Job(jobId, jobTime));
         }
 
         Collections.sort(jobs);
-        int currentTime = 0;
-        double totalCompletionTime = 0;
-        List<Integer> executionOrder = new ArrayList<>();
 
-        for (Job job : jobs) {
-            currentTime += job.processingTime;
-            totalCompletionTime += currentTime;
-            executionOrder.add(job.jobId);
+        int totalTime = 0, completionTime = 0;
+        System.out.print("Execution order: [");
+        for (int i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
+            totalTime += job.time;
+            completionTime += totalTime;
+            System.out.print(job.id + (i == jobs.size() - 1 ? "" : ", "));
         }
-
-        System.out.println("Execution order: " + executionOrder);
-        System.out.printf("Average completion time: %.2f%n", totalCompletionTime / jobs.size());
+        System.out.println("]");
+        System.out.println("Average completion time: " + (double) completionTime / jobs.size());
     }
 }
+
